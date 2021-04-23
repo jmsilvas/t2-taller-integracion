@@ -19,5 +19,10 @@ from myapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('artists/<str:artist_id>', views.get_artist)
+    path('artists', views.get_all_artists),
+    path('albums/', views.get_all_albums),
+    path('tracks/', views.get_all_tracks),
+    path('artists/<str:artist_id>', views.get_artist),
+    path('albums/<str:album_id>', views.get_album),
+    path('tracks/<str:track_id>', views.get_track)
 ]
