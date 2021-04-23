@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
+#new
+import django_heroku
+import dj_database_url
+import os
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +31,7 @@ SECRET_KEY = 'django-insecure-*+7l_q-hw95!(&^%5r!q1vlw*x+g74!pqhljp^fa-f5($1t+tl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -74,11 +80,16 @@ WSGI_APPLICATION = 'RestApi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'apidb',
+#     }
+# }
+
+#new
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'apidb',
-    }
+    'default': dj_database_url.config()
 }
 
 
@@ -119,6 +130,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#new
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+django_heroku.settings(locals())
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

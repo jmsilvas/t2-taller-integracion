@@ -43,7 +43,7 @@ def get_all_artists(request):
                         )
         try:
             artist.save()
-            response = json.dumps([{"succes": "artist created"}])
+            response = json.dumps([{"success": "artist created"}])
         except:
             response = json.dumps([{"Error": "something went wrong"}])
     return HttpResponse(response, content_type='application/json')
