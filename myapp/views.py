@@ -5,7 +5,7 @@ import json
 from myapp.models import Artist, Album, Track
 from base64 import b64encode
 
-URL = "http://127.0.0.1:8000/"
+URL = "https://murmuring-mountain-08300.herokuapp.com/"
 
 
 ## GET
