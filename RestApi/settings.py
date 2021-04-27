@@ -89,13 +89,11 @@ WSGI_APPLICATION = 'RestApi.wsgi.application'
 #     }
 # }
 #fix
-ON_HEROKU = 'ON_HEROKU' in os.environ
+
 
 DATABASE_URL = 'postgres://ekocnvcrslpcct:522df18b04925ca3644690d53aec79aa9562773d43c2071ac377c9670f9fea49@ec2-3-212-75-25.compute-1.amazonaws.com:5432/d3svte6qb80aie'
-# if ON_HEROKU:
-#     DATABASE_URL = 'postgres://ekocnvcrslpcct:522df18b04925ca3644690d53aec79aa9562773d43c2071ac377c9670f9fea49@ec2-3-212-75-25.compute-1.amazonaws.com:5432/d3svte6qb80aie'
-# else:
-#     DATABASE_URL = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+
+# DATABASE_URL = 'postgresql://localhost/apidb'
 
 #new
 DATABASES = {

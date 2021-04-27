@@ -30,7 +30,7 @@ class Album(models.Model):
     ID = models.CharField(max_length=30, primary_key=True)
     artist_id = models.ForeignKey(Artist, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
-    genre = models.IntegerField()
+    genre = models.CharField(max_length=30)
     artist = models.URLField()
     tracks = models.URLField()
     myself = models.URLField()
