@@ -1,7 +1,5 @@
 from django.db import models
 
-# Relaciones 1:n
-# reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
 # Cada artista debe tener los siguientes atributos:
 # ID. (string)

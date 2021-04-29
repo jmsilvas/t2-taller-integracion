@@ -9,9 +9,6 @@ URL = "https://murmuring-mountain-08300.herokuapp.com/"
 # URL = "http://127.0.0.1:8000/"
 
 
-
-
-
  # GET /artists: retorna todos los artistas.
  # POST /artists: crea un artista y retorna el artista creado.
 @csrf_exempt
@@ -86,6 +83,8 @@ def get_all_tracks(request):
         return HttpResponse(response, content_type='application/json')
 
 # GET /artists/<artist_id>: retorna el artista <artist_id>.
+# DELETE /artists/<artist_id>: elimina el artista <artist_id> y todos sus álbums.
+@csrf_exempt
 def get_artist(request, artist_id):
     if request.method == 'GET':
         try:
@@ -98,9 +97,23 @@ def get_artist(request, artist_id):
                                     'self': artist.myself})
         except:
             response = json.dumps({'Error': 'No artist with that id'})
-        return HttpResponse(response, content_type='application/json')
+    elif request.method == 'DELETE':
+        try:
+            artist = Artist.objects.get(ID=artist_id)
+            response = json.dumps({'id': artist.ID,
+                                    'name': artist.name,
+                                    'age': artist.age,
+                                    'albums': artist.albums,
+                                    'tracks': artist.tracks,
+                                    'self': artist.myself})
+            artist.delete()
+        except:
+            response = json.dumps({'Error': 'No artist with that id'})
+    return HttpResponse(response, content_type='application/json')
 
 # GET /albums/<album_id>: retorna el álbum <album_id>.
+# DELETE /albums/<album_id>: elimina el álbum <album_id> y todas sus canciones.
+@csrf_exempt
 def get_album(request, album_id):
     if request.method == 'GET':
         try:
@@ -114,9 +127,24 @@ def get_album(request, album_id):
                                     'self': album.myself})
         except:
             response = json.dumps({'Error': 'No album with that id'})
-        return HttpResponse(response, content_type='application/json')
+    elif request.method == 'DELETE':
+        try:
+            album = Album.objects.get(ID=album_id)
+            response = json.dumps({'id': album.ID,
+                                    'artist_id': album.artist_id_id,
+                                    'name': album.name,
+                                    'genre': album.genre,
+                                    'artist': album.artist,
+                                    'tracks': album.tracks,
+                                    'self': album.myself})
+            album.delete()
+        except:
+            response = json.dumps({'Error': 'No album with that id'})
+    return HttpResponse(response, content_type='application/json')
 
 # GET /tracks/<track_id>: retorna la canción <track_id>.
+# DELETE /tracks/<track_id>: elimina la canción <track_id>.
+@csrf_exempt
 def get_track(request, track_id):
     if request.method == 'GET':
         try:
@@ -131,7 +159,21 @@ def get_track(request, track_id):
                                     'self': track.myself})
         except:
             response = json.dumps({'Error': 'No track with that id'})
-        return HttpResponse(response, content_type='application/json')
+    elif request.method == 'DELETE':
+        try:
+            track = Track.objects.get(ID=track_id)
+            response = json.dumps({'id': track.ID,
+                                    'album_id': track.album_id_id,
+                                    'name': track.name,
+                                    'duration': track.duration,
+                                    'times played': track.times_played,
+                                    'artist': track.artist,
+                                    'album': track.album,
+                                    'self': track.myself})
+            track.delete()
+        except:
+            response = json.dumps({'Error': 'No track with that id'})
+    return HttpResponse(response, content_type='application/json')
 
 
 # GET /artists/<artist_id>/tracks: retorna todas las canciones del artista <artist_id>.
