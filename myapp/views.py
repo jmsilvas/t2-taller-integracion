@@ -196,7 +196,7 @@ def get_track(request, track_id):
 def get_artist_tracks(request, artist_id):
     if request.method == 'GET':
         try:
-            artist = Artist.objects.get(artist_id=artist_id)
+            artist = Artist.objects.get(ID=artist_id)
         except:
             return HttpResponse(content_type='application/json', status=404, reason="artista no encontrado")  
     
@@ -263,7 +263,7 @@ def post_album(request, artist_id):
             return HttpResponse(content_type='application/json', status=400, reason="input inválido")
     elif request.method == 'GET':
         try:
-            artist = Artist.objects.get(artist_id=artist_id)
+            artist = Artist.objects.get(ID=artist_id)
         except:
             return HttpResponse(content_type='application/json', status=404, reason="artista no encontrado")  
         album_objects = Album.objects.filter(artist_id=artist_id)
