@@ -27,5 +27,8 @@ urlpatterns = [
     path('artists/<str:artist_id>/tracks', views.get_artist_tracks),
     path('albums/<str:album_id>', views.get_album),
     path('albums/<str:album_id>/tracks', views.post_track),
-    path('tracks/<str:track_id>', views.get_track)
+    path('tracks/<str:track_id>', views.get_track),
+    path('tracks/<str:track_id>/play', views.play_track),
+    path('albums/<str:album_id>/tracks/play', views.play_album_tracks),
+    path('artists/<str:artist_id>/albums/play', views.play_artist_tracks),
 ]

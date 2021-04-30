@@ -13,7 +13,6 @@ URL = "https://murmuring-mountain-08300.herokuapp.com/"
  # POST /artists: crea un artista y retorna el artista creado.
 @csrf_exempt
 def get_all_artists(request):
-   
     if request.method == 'GET':
         try:
             artist_objects = Artist.objects.all()
@@ -24,14 +23,20 @@ def get_all_artists(request):
                         'tracks': artist.tracks,
                         'self': artist.myself} for artist in artist_objects]
             response = json.dumps(artists)
-            
+            return HttpResponse(response, content_type='application/json', status=200, reason="resultados obtenidos")
         except:
             response = json.dumps({'Error': 'failed showing artists'})
+            return HttpResponse(response, content_type='application/json', status=500, reason="internal server error")
+        
     elif request.method == 'POST':
         payload = json.loads(request.body)
         id_ = b64encode(payload["name"].encode()).decode('utf-8')
+        if Artist.objects.get(ID=id_):
+            return HttpResponse(response, content_type='application/json', status=409, reason="artista ya existe")
         self_link = URL+"artists/"+id_
-        artist = Artist(
+
+        try:
+            artist = Artist(
                         ID=id_, 
                         name=payload["name"],
                         age=payload["age"],
@@ -39,48 +44,45 @@ def get_all_artists(request):
                         tracks= self_link+"/tracks",
                         myself= self_link  
                         )
-        try:
             artist.save()
-            response = json.dumps([{"success": "artist created"}])
+            response = json.dumps({'id': artist.ID,
+                                'name': artist.name,
+                                'age': artist.age,
+                                'albums': artist.albums,
+                                'tracks': artist.tracks,
+                                'self': artist.myself})
+            return HttpResponse(response, content_type='application/json', status=201, reason="artista creado")
         except:
-            response = json.dumps([{"Error": "something went wrong"}])
-    return HttpResponse(response, content_type='application/json')
+            return HttpResponse(content_type='application/json', status=400, reason="input inválido")
+       
 
 # GET /albums: retorna todos los álbums.
 def get_all_albums(request):
     if request.method == 'GET':
         album_objects = Album.objects.all()
-        try:
-            albums = [{'id': album.ID,
-                        'artist_id': album.artist_id_id,
-                        'name': album.name,
-                        'genre': album.genre,
-                        'artist': album.artist,
-                        'tracks': album.tracks,
-                        'self': album.myself} for album in album_objects]
-            response = json.dumps(albums)
-        except:
-            response = json.dumps({'Error': 'No album with that id'})
-        return HttpResponse(response, content_type='application/json')
-## fix 'Album' object has no attribute 'album_id_id' cuando esta vacia
+        albums = [{'id': album.ID,
+                    'artist_id': album.artist_id_id,
+                    'name': album.name,
+                    'genre': album.genre,
+                    'artist': album.artist,
+                    'tracks': album.tracks,
+                    'self': album.myself} for album in album_objects]
+        response = json.dumps(albums)
+        return HttpResponse(response, content_type='application/json', status=200, reason="resultados obtenidos")
 # GET /tracks: retorna todas las canciones.
 def get_all_tracks(request):
     if request.method == 'GET':
         track_objects = Track.objects.all()
-      
-        try:
-            tracks = [{'id': track.ID,
-                    'album_id': track.album_id_id,
-                    'name': track.name,
-                    'duration': track.duration,
-                    'times played': track.times_played,
-                    'artist': track.artist,
-                    'album': track.album,
-                    'self': track.myself} for track in track_objects]
-            response = json.dumps(tracks)
-        except:
-            response = json.dumps({'Error': 'No track with that id'})
-        return HttpResponse(response, content_type='application/json')
+        tracks = [{'id': track.ID,
+                'album_id': track.album_id_id,
+                'name': track.name,
+                'duration': track.duration,
+                'times played': track.times_played,
+                'artist': track.artist,
+                'album': track.album,
+                'self': track.myself} for track in track_objects]
+        response = json.dumps(tracks)
+        return HttpResponse(response, content_type='application/json', status=200, reason="operación exitosa")
 
 # GET /artists/<artist_id>: retorna el artista <artist_id>.
 # DELETE /artists/<artist_id>: elimina el artista <artist_id> y todos sus álbums.
@@ -95,8 +97,9 @@ def get_artist(request, artist_id):
                                     'albums': artist.albums,
                                     'tracks': artist.tracks,
                                     'self': artist.myself})
+            return HttpResponse(response, content_type='application/json', status=200, reason="operación exitosa")
         except:
-            response = json.dumps({'Error': 'No artist with that id'})
+            return HttpResponse(content_type='application/json', status=404, reason="artista no encontrado")
     elif request.method == 'DELETE':
         try:
             artist = Artist.objects.get(ID=artist_id)
@@ -107,9 +110,9 @@ def get_artist(request, artist_id):
                                     'tracks': artist.tracks,
                                     'self': artist.myself})
             artist.delete()
+            return HttpResponse(response, content_type='application/json', status=204, reason="artista eliminado")    
         except:
-            response = json.dumps({'Error': 'No artist with that id'})
-    return HttpResponse(response, content_type='application/json')
+            return HttpResponse(content_type='application/json', status=404, reason="artista inexistente")    
 
 # GET /albums/<album_id>: retorna el álbum <album_id>.
 # DELETE /albums/<album_id>: elimina el álbum <album_id> y todas sus canciones.
@@ -125,8 +128,9 @@ def get_album(request, album_id):
                                     'artist': album.artist,
                                     'tracks': album.tracks,
                                     'self': album.myself})
+            return HttpResponse(response, content_type='application/json', status=200, reason="operación exitosa")
         except:
-            response = json.dumps({'Error': 'No album with that id'})
+            return HttpResponse(content_type='application/json', status=404, reason="álbum no encontrado")  
     elif request.method == 'DELETE':
         try:
             album = Album.objects.get(ID=album_id)
@@ -138,9 +142,9 @@ def get_album(request, album_id):
                                     'tracks': album.tracks,
                                     'self': album.myself})
             album.delete()
+            return HttpResponse(response, content_type='application/json', status=204, reason="álbum eliminado")    
         except:
-            response = json.dumps({'Error': 'No album with that id'})
-    return HttpResponse(response, content_type='application/json')
+            return HttpResponse(content_type='application/json', status=404, reason="álbum no encontrado") 
 
 # GET /tracks/<track_id>: retorna la canción <track_id>.
 # DELETE /tracks/<track_id>: elimina la canción <track_id>.
@@ -157,8 +161,9 @@ def get_track(request, track_id):
                                     'artist': track.artist,
                                     'album': track.album,
                                     'self': track.myself})
+            return HttpResponse(response, content_type='application/json', status=200, reason="operación exitosa")
         except:
-            response = json.dumps({'Error': 'No track with that id'})
+            return HttpResponse(content_type='application/json', status=404, reason="Canción no encontrada")
     elif request.method == 'DELETE':
         try:
             track = Track.objects.get(ID=track_id)
@@ -171,17 +176,18 @@ def get_track(request, track_id):
                                     'album': track.album,
                                     'self': track.myself})
             track.delete()
+            return HttpResponse(response, content_type='application/json', status=204, reason="canción eliminada")    
         except:
-            response = json.dumps({'Error': 'No track with that id'})
-    return HttpResponse(response, content_type='application/json')
+            return HttpResponse(content_type='application/json', status=404, reason="canción inexistente") 
+  
 
 
 # GET /artists/<artist_id>/tracks: retorna todas las canciones del artista <artist_id>.
 def get_artist_tracks(request, artist_id):
     if request.method == 'GET':
-        track_objects = Track.objects.filter(artist=URL+"artists/"+artist_id)
-        print(len(track_objects))
-        tracks = [{'id': track.ID,
+        try:
+            track_objects = Track.objects.filter(artist=URL+"artists/"+artist_id)
+            tracks = [{'id': track.ID,
                     'album_id': track.album_id_id,
                     'name': track.name,
                     'duration': track.duration,
@@ -189,23 +195,23 @@ def get_artist_tracks(request, artist_id):
                     'artist': track.artist,
                     'album': track.album,
                     'self': track.myself} for track in track_objects]
-        response = json.dumps(tracks)
-        try:
-            print("hello")
+            response = json.dumps(tracks)
+            return HttpResponse(response, content_type='application/json', status=200, reason="operación exitosa")
         except:
-            response = json.dumps({'Error': 'No track with that id'})
-        return HttpResponse(response, content_type='application/json')
-
+            return HttpResponse(response, content_type='application/json', status=404, reason="artista no encontrado")
 
 # GET /artists/<artist_id>/albums: retorna todos los albums del artista <artist_id>.
 # POST /artists/<artist_id>/albums: crea un álbum del artista <artist_id> y retorna el
 #álbum creado.
-# fix: titulos muy largos
 @csrf_exempt
 def post_album(request, artist_id):
     if request.method == 'POST':
         payload = json.loads(request.body)
         id_ = b64encode(payload["name"].encode()).decode('utf-8')
+        if Album.objects.get(ID=id_):
+            return HttpResponse(content_type='application/json', status=409, reason="álbum ya existe")
+        if not Artist.objects.get(ID=artist_id):
+            return HttpResponse(content_type='application/json', status=422, reason="artista no existe")
         album_link = URL+"albums/"+id_
         album = Album(
                         ID = id_,
@@ -218,9 +224,16 @@ def post_album(request, artist_id):
                         )
         try:
             album.save()
-            response = json.dumps([{"success": "album created"}])
+            response = json.dumps({'id': album.ID,
+                                'artist_id': album.artist_id_id,
+                                'name': album.name,
+                                'genre': album.genre,
+                                'artist': album.artist,
+                                'tracks': album.tracks,
+                                'self': album.myself})
+            return HttpResponse(response, content_type='application/json', status=201, reason="álbum creado")
         except:
-            response = json.dumps([{"Error": "something went wrong"}])
+            return HttpResponse(content_type='application/json', status=400, reason="input inválido")
     elif request.method == 'GET':
         album_objects = Album.objects.filter(artist_id=artist_id)
         try:
@@ -232,9 +245,9 @@ def post_album(request, artist_id):
                     'tracks': album.tracks,
                     'self': album.myself} for album in album_objects]
             response = json.dumps(albums)
+            return HttpResponse(response, content_type='application/json', status=200, reason="resultados obtenidos")
         except:
-            response = json.dumps({'Error': 'No album with that id'})
-    return HttpResponse(response, content_type='application/json')
+            return HttpResponse(content_type='application/json', status=404, reason="artista no encontrado")    
 
 # GET /albums/<album_id>/tracks: retorna todas las canciones del álbum
 # <album_id>.
@@ -245,9 +258,15 @@ def post_track(request, album_id):
     if request.method == 'POST':
         payload = json.loads(request.body)
         id_ = b64encode(payload["name"].encode()).decode('utf-8')
+        if Track.objects.get(ID=id_):
+            return HttpResponse(content_type='application/json', status=409, reason="canción ya existe")
+        if not Album.objects.get(ID=album_id):
+            return HttpResponse(content_type='application/json', status=422, reason="álbum no existe")
         album = Album.objects.get(ID=album_id)
         artist = Artist.objects.get(ID=album.artist_id.ID)
-        track = Track(
+          
+        try:
+            track = Track(
                         ID = id_,
                         album_id = album,
                         name = payload["name"],
@@ -257,24 +276,87 @@ def post_track(request, album_id):
                         album = URL+"albums/"+album.ID,
                         myself = URL+"tracks/"+id_
                         )
-        track.save()    
-        try:
-        
-            response = json.dumps([{"success": "track created"}])
+            track.save()  
+            response = json.dumps({'id': track.ID,
+                                'album_id': track.album_id_id,
+                                'name': track.name,
+                                'duration': track.duration,
+                                'times played': track.times_played,
+                                'artist': track.artist,
+                                'album': track.album,
+                                'self': track.myself})
+            return HttpResponse(response, content_type='application/json', status=201, reason="álbum creado")
         except:
-            response = json.dumps([{"Error": "something went wrong"}])
+            return HttpResponse(content_type='application/json', status=400, reason="input inválido")
     elif request.method == 'GET':
-        track_objects = Track.objects.filter(album_id=album_id)
         try:
-            tracks = [{'id': track.ID,
-                    'album_id': track.album_id_id,
-                    'name': track.name,
-                    'duration': track.duration,
-                    'times played': track.times_played,
-                    'artist': track.artist,
-                    'album': track.album,
-                    'self': track.myself} for track in track_objects]
-            response = json.dumps(tracks)
+            album = Album.objects.get(ID=album_id)
         except:
-            response = json.dumps({'Error': 'No track with that id'})
-    return HttpResponse(response, content_type='application/json')
+            return HttpResponse(content_type='application/json', status=404, reason="álbum no encontrado")
+        track_objects = Track.objects.filter(album_id=album_id)
+        tracks = [{'id': track.ID,
+                'album_id': track.album_id_id,
+                'name': track.name,
+                'duration': track.duration,
+                'times played': track.times_played,
+                'artist': track.artist,
+                'album': track.album,
+                'self': track.myself} for track in track_objects]
+        response = json.dumps(tracks)
+        return HttpResponse(response, content_type='application/json', status=200, reason="operación exitosa")
+
+
+# PUT /tracks/<track_id>/play: reproduce la canción <track_id>.
+@csrf_exempt
+def play_track(request, track_id):
+    if request.method == 'PUT':
+        try:
+            track = Track.objects.get(ID=track_id)
+            response = json.dumps({'id': track.ID,
+                                    'album_id': track.album_id_id,
+                                    'name': track.name,
+                                    'duration': track.duration,
+                                    'times played': track.times_played,
+                                    'artist': track.artist,
+                                    'album': track.album,
+                                    'self': track.myself})
+            track.times_played +=1
+            response = json.dumps({'id': track.ID,
+                                    'album_id': track.album_id_id,
+                                    'name': track.name,
+                                    'duration': track.duration,
+                                    'times played': track.times_played,
+                                    'artist': track.artist,
+                                    'album': track.album,
+                                    'self': track.myself})
+            track.save()
+            return HttpResponse(content_type='application/json', status=200, reason="canción reproducida")    
+        except:
+            return HttpResponse(content_type='application/json', status=404, reason="canción no encontrada") 
+
+# PUT /albums/<album_id>/tracks/play: reproduce todas las canciones del álbum
+# <album_id>
+@csrf_exempt
+def play_album_tracks(request, album_id):
+    if request.method == 'PUT':
+        try:
+            track_objects = Track.objects.filter(album_id=album_id)
+            for track in track_objects:
+                track.times_played +=1
+                track.save()
+            return HttpResponse(content_type='application/json', status=200, reason="canciones del álbum reproducidas")    
+        except:
+            return HttpResponse(content_type='application/json', status=404, reason="álbum no encontrado") 
+
+# PUT /artists/<artist_id>/albums/play
+@csrf_exempt
+def play_artist_tracks(request, artist_id):
+    if request.method == 'PUT':
+        try:
+            track_objects = Track.objects.filter(artist=URL+"artists/"+artist_id)
+            for track in track_objects:
+                track.times_played +=1
+                track.save()
+            return HttpResponse(content_type='application/json', status=200, reason="todas las canciones del artista fueron reproducidas")    
+        except:
+            return HttpResponse(content_type='application/json', status=404, reason="artista no encontrado") 
