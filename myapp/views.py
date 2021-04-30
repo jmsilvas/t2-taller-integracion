@@ -29,13 +29,12 @@ def get_all_artists(request):
             return HttpResponse(response, content_type='application/json', status=500, reason="internal server error")
         
     elif request.method == 'POST':
-        payload = json.loads(request.body)
-        id_ = b64encode(payload["name"].encode()).decode('utf-8')
-        if Artist.objects.get(ID=id_):
-            return HttpResponse(response, content_type='application/json', status=409, reason="artista ya existe")
-        self_link = URL+"artists/"+id_
-
-        try:
+        try:  
+            payload = json.loads(request.body)
+            id_ = b64encode(payload["name"].encode()).decode('utf-8')
+            if Artist.objects.get(ID=id_):
+                return HttpResponse(response, content_type='application/json', status=409, reason="artista ya existe")
+            self_link = URL+"artists/"+id_
             artist = Artist(
                         ID=id_, 
                         name=payload["name"],
@@ -206,23 +205,23 @@ def get_artist_tracks(request, artist_id):
 @csrf_exempt
 def post_album(request, artist_id):
     if request.method == 'POST':
-        payload = json.loads(request.body)
-        id_ = b64encode(payload["name"].encode()).decode('utf-8')
-        if Album.objects.get(ID=id_):
-            return HttpResponse(content_type='application/json', status=409, reason="álbum ya existe")
-        if not Artist.objects.get(ID=artist_id):
-            return HttpResponse(content_type='application/json', status=422, reason="artista no existe")
-        album_link = URL+"albums/"+id_
-        album = Album(
-                        ID = id_,
-                        artist_id = Artist.objects.get(ID=artist_id),
-                        name = payload["name"],
-                        genre = payload["genre"],
-                        artist = URL+"artists/"+artist_id,
-                        tracks = album_link+"/tracks",
-                        myself = album_link
-                        )
         try:
+            payload = json.loads(request.body)
+            id_ = b64encode(payload["name"].encode()).decode('utf-8')
+            if Album.objects.get(ID=id_):
+                return HttpResponse(content_type='application/json', status=409, reason="álbum ya existe")
+            if not Artist.objects.get(ID=artist_id):
+                return HttpResponse(content_type='application/json', status=422, reason="artista no existe")
+            album_link = URL+"albums/"+id_
+            album = Album(
+                            ID = id_,
+                            artist_id = Artist.objects.get(ID=artist_id),
+                            name = payload["name"],
+                            genre = payload["genre"],
+                            artist = URL+"artists/"+artist_id,
+                            tracks = album_link+"/tracks",
+                            myself = album_link
+                            )
             album.save()
             response = json.dumps({'id': album.ID,
                                 'artist_id': album.artist_id_id,
@@ -256,16 +255,15 @@ def post_album(request, artist_id):
 @csrf_exempt
 def post_track(request, album_id):
     if request.method == 'POST':
-        payload = json.loads(request.body)
-        id_ = b64encode(payload["name"].encode()).decode('utf-8')
-        if Track.objects.get(ID=id_):
-            return HttpResponse(content_type='application/json', status=409, reason="canción ya existe")
-        if not Album.objects.get(ID=album_id):
-            return HttpResponse(content_type='application/json', status=422, reason="álbum no existe")
-        album = Album.objects.get(ID=album_id)
-        artist = Artist.objects.get(ID=album.artist_id.ID)
-          
         try:
+            payload = json.loads(request.body)
+            id_ = b64encode(payload["name"].encode()).decode('utf-8')
+            if Track.objects.get(ID=id_):
+                return HttpResponse(content_type='application/json', status=409, reason="canción ya existe")
+            if not Album.objects.get(ID=album_id):
+                return HttpResponse(content_type='application/json', status=422, reason="álbum no existe")
+            album = Album.objects.get(ID=album_id)
+            artist = Artist.objects.get(ID=album.artist_id.ID)
             track = Track(
                         ID = id_,
                         album_id = album,
