@@ -293,8 +293,7 @@ def post_track(request, album_id):
                 id_ = id_[:22]  
             try:
                 track = Track.objects.get(ID=id_)
-                response = json.dumps({'id': track.ID,
-                                'album_id': track.album_id_id,
+                response = json.dumps({
                                 'name': track.name,
                                 'duration': track.duration,
                                 'times played': track.times_played,
