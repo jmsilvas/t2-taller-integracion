@@ -316,8 +316,7 @@ def post_track(request, album_id):
                         myself = URL+"tracks/"+id_
                         )
             track.save()  
-            response = json.dumps({'id': track.ID,
-                                'album_id': track.album_id_id,
+            response = json.dumps({
                                 'name': track.name,
                                 'duration': track.duration,
                                 'times played': track.times_played,
