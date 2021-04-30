@@ -87,7 +87,7 @@ def get_all_tracks(request):
                 'album_id': track.album_id_id,
                 'name': track.name,
                 'duration': track.duration,
-                'times played': track.times_played,
+                'times_played': track.times_played,
                 'artist': track.artist,
                 'album': track.album,
                 'self': track.myself} for track in track_objects]
@@ -167,7 +167,7 @@ def get_track(request, track_id):
                                     'album_id': track.album_id_id,
                                     'name': track.name,
                                     'duration': track.duration,
-                                    'times played': track.times_played,
+                                    'times_played': track.times_played,
                                     'artist': track.artist,
                                     'album': track.album,
                                     'self': track.myself})
@@ -181,7 +181,7 @@ def get_track(request, track_id):
                                     'album_id': track.album_id_id,
                                     'name': track.name,
                                     'duration': track.duration,
-                                    'times played': track.times_played,
+                                    'times_played': track.times_played,
                                     'artist': track.artist,
                                     'album': track.album,
                                     'self': track.myself})
@@ -201,11 +201,10 @@ def get_artist_tracks(request, artist_id):
             return HttpResponse(content_type='application/json', status=404, reason="artista no encontrado")  
     
         track_objects = Track.objects.filter(artist=URL+"artists/"+artist_id)
-        tracks = [{'id': track.ID,
-                'album_id': track.album_id_id,
+        tracks = [{
                 'name': track.name,
                 'duration': track.duration,
-                'times played': track.times_played,
+                'times_played': track.times_played,
                 'artist': track.artist,
                 'album': track.album,
                 'self': track.myself} for track in track_objects]
@@ -338,7 +337,7 @@ def post_track(request, album_id):
         tracks = [{
                 'name': track.name,
                 'duration': track.duration,
-                'times played': track.times_played,
+                'times_played': track.times_played,
                 'artist': track.artist,
                 'album': track.album,
                 'self': track.myself} for track in track_objects]
@@ -356,7 +355,7 @@ def play_track(request, track_id):
                                     'album_id': track.album_id_id,
                                     'name': track.name,
                                     'duration': track.duration,
-                                    'times played': track.times_played,
+                                    'times_played': track.times_played,
                                     'artist': track.artist,
                                     'album': track.album,
                                     'self': track.myself})
@@ -365,7 +364,7 @@ def play_track(request, track_id):
                                     'album_id': track.album_id_id,
                                     'name': track.name,
                                     'duration': track.duration,
-                                    'times played': track.times_played,
+                                    'times_played': track.times_played,
                                     'artist': track.artist,
                                     'album': track.album,
                                     'self': track.myself})
