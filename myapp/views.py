@@ -296,7 +296,7 @@ def post_track(request, album_id):
                 response = json.dumps({
                                 'name': track.name,
                                 'duration': track.duration,
-                                'times played': track.times_played,
+                                'times_played': track.times_played,
                                 'artist': track.artist,
                                 'album': track.album,
                                 'self': track.myself})
@@ -319,7 +319,7 @@ def post_track(request, album_id):
             response = json.dumps({
                                 'name': track.name,
                                 'duration': track.duration,
-                                'times played': track.times_played,
+                                'times_played': track.times_played,
                                 'artist': track.artist,
                                 'album': track.album,
                                 'self': track.myself})
